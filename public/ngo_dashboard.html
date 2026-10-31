@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NGO Dashboard - CivicConnect</title>
+  <link rel="stylesheet" href="styleMain.css">
+  <link rel="stylesheet" href="ngo_dashboard.css">
+</head>
+<body>
+
+<div id="navbar">
+  <div id="logo-area">
+    <h2 id="logo">
+      <img src="logo.svg" alt="CivicConnect Logo" width="160">
+    </h2>
+  </div>
+
+  <nav>
+    <ul id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ngo_dashboard.html" class="active">Dashboard</a></li>
+    </ul>
+    <ul id="auth-links">
+      <li><a href="#" id="logout-btn">Logout</a></li>
+    </ul>
+  </nav>
+</div>
+
+<div class="ngo-container">
+  <h2>Assigned Complaints</h2>
+  <p id="stats" style="color:#555"></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Complaint</th>
+        <th>Department</th>
+        <th>Citizen</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>View</th>
+      </tr>
+    </thead>
+    <tbody id="complaint-list">
+      <tr><td colspan="6">Loading...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="api.js"></script>
+<script>
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function requireNGO() {
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'NGO') {
+      alert('Please login as an NGO to access this page');
+      window.location.href = 'login.html';
+      return false;
+    }
+    return true;
+  }
+
+  async function loadComplaints() {
+    if (!requireNGO()) return;
+    const tbody = document.getElementById('complaint-list');
+
+    try {
+      const complaints = await CivicConnectAPI.getNGOComplaints();
+      const stats = await CivicConnectAPI.getStatistics();
+      document.getElementById('stats').textContent =
+        `Total: ${stats.total} | Pending: ${stats.pending} | In Progress: ${stats.inProgress} | Resolved: ${stats.resolved} | Rejected: ${stats.rejected}`;
+
+      if (!complaints.length) {
+        tbody.innerHTML = '<tr><td colspan="6">No complaints assigned to your organization yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = complaints.map(c => `
+        <tr>
+          <td>${esc(c.subject)}</td>
+          <td>${esc(c.department)}</td>
+          <td>${esc(c.name)}</td>
+          <td>${new Date(c.createdAt).toLocaleDateString()}</td>
+          <td><span class="status-badge ${esc(c.status.toLowerCase().replace(/\s+/g, '-'))}">${esc(c.status)}</span></td>
+          <td><a href="ngo_complaint_detail.html?id=${encodeURIComponent(c.id)}" class="view-btn">Open</a></td>
+        </tr>`).join('');
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) {
+        localStorage.clear();
+        window.location.href = 'login.html';
+        return;
+      }
+      tbody.innerHTML = `<tr><td colspan="6">Error loading complaints: ${esc(err.message)}</td></tr>`;
+    }
+  }
+
+  document.getElementById('logout-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.clear();
+    window.location.href = 'index.html';
+  });
+
+  document.addEventListener('DOMContentLoaded', loadComplaints);
+</script>
+
+</body>
+</html>

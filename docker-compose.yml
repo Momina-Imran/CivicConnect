@@ -1,0 +1,44 @@
+# PART I - uses the image pushed to Docker Hub (replace mominaaa)
+services:
+  db:
+    image: mysql:8.0
+    container_name: civic_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPass#2026
+      MYSQL_DATABASE: civicconnect
+      MYSQL_USER: civic_app
+      MYSQL_PASSWORD: CivicPass#2026
+    ports:
+      - "3307:3306"            # host 3307 -> container 3306
+    volumes:
+      - civic_db_data:/var/lib/mysql      # persistent DB volume
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pRootPass#2026 --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  web:
+    image: mominaaa/civicconnect:1.0
+    container_name: civic_web
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      JWT_SECRET: change-this-to-a-long-random-string
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: civic_app
+      DB_PASSWORD: CivicPass#2026
+      DB_NAME: civicconnect
+    ports:
+      - "8000:3000"            # host 8000 -> container 3000
+    volumes:
+      - civic_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  civic_db_data:
+  civic_uploads:

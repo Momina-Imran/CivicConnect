@@ -1,0 +1,366 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #CBDED3;
+    color: #333;
+}
+nav {
+  display: flex;
+  justify-content: space-between; /* left links on left, login/signup on right */
+  align-items: center;
+  width: 100%;
+  margin-top: 2px;
+}
+/* Navbar styling */
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column; /* stack logo above links */
+  background-color: white;
+  padding: 5px 25px 0px;
+  color: black;
+}
+
+/* Logo section */
+#logo img {
+  height: auto;
+  max-height: 130px;
+  margin: 0;   
+  width: auto;
+  max-width: 100%;
+  display: block;
+  margin-bottom: 0.5px; /* space between logo and links */
+  object-fit: contain;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  image-rendering: auto;
+}
+#logo-area {
+  
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0px;
+}
+/* ensure the logo container aligns items consistently */
+#logo {
+  display: flex;
+  align-items: center;
+}
+
+/* Navigation links below logo, left-aligned */
+#nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 12px;
+}
+
+
+
+#auth-links {
+  list-style: none;
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+
+#nav-links li {
+  margin: 0; /* remove left margin for better alignment */
+}
+#auth-links a,
+#nav-links a {
+  text-decoration: none;
+  color: rgb(109, 74, 10);
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: 0.3s;
+  font-size: 1.1rem;
+}
+#auth-links a:hover,
+#nav-links a:hover {
+  background-color: beige;
+}
+
+
+/* ---------- HERO: image + typing heading + caption ---------- */
+#hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* banner image unchanged (no opacity/brightness change) */
+#hero-banner {
+  /* Keep width fluid but preserve aspect ratio */
+  width: 100%;
+  height: auto;           /* do not force fixed height—prevents vertical stretching */
+  max-height: 520px;      /* visual maximum to match prior design */
+  object-fit: cover;      /* fills the container while maintaining aspect ratio */
+  display: block;
+  opacity: 0.85;         /* Added opacity (85% visible) */
+  filter: brightness(0.95); /* Slightly dim the image */
+
+  /* Rendering/GPU hints to reduce blurriness during scaling */
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  image-rendering: auto;
+}
+
+/* Typing heading placed top-right over the banner */
+.typing-text {
+  position: absolute;
+  top: 5%;
+  left: 4%;
+  margin: 0;
+  padding: 6px 10px;
+  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size: 2.75rem; /* or 4rem if you want it bolder */
+  font-weight: 700;
+  color: #ffffff;
+  /* strong text shadow for readability over any image */
+  text-shadow:
+    0 1px 0 rgba(0,0,0,0.35),
+    0 4px 18px rgba(0,0,0,0.45);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: content-box;
+
+  /* Tuning variables: --chars = approx number of characters to reveal.
+     --type-duration controls typing speed. */
+  --chars: 22;                /* default; match to your heading length */
+  --type-duration: 2.6s;     /* total typing time (tweak faster/slower) */
+
+  /* the core typing effect: animate width in ch units using step timing */
+  width: 0ch;
+  border-right: 3px solid #ffd166; /* cursor */
+  animation:
+    typing var(--type-duration) steps(var(--chars), end) forwards,
+    blink 0.7s step-end infinite;
+}
+
+/* typing keyframes: grow width from 0ch to N ch */
+@keyframes typing {
+  from { width: 0ch; }
+  to   { width: calc(var(--chars) * 1ch); }
+}
+
+/* cursor blink */
+@keyframes blink {
+  50% { border-color: transparent; }
+  0%,100% { border-color: #ffd166; }
+}
+
+/* Caption (tagline) BELOW the banner */
+.banner-caption {
+  max-width: 900px;
+  margin: 18px auto 36px; /* centered below banner */
+  padding: 0 20px;
+  text-align: center;
+}
+
+.banner-caption p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #0a3d62;           /* clear readable color */
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* small responsive tweak: reduce right offset on narrow screens */
+@media (max-width: 700px) {
+  .typing-text {
+    left: 4%;
+    top: 8%;
+    font-size: 1.4rem;
+    --type-duration: 2s;   /* a tad faster on mobile */
+    --chars: 22;           /* keep accurate for step count */
+  }
+}
+
+#get-started { 
+  background-color: #0a3d62; 
+  color: white; 
+  border: none; 
+  padding: 12px 25px; 
+  font-size: 1rem; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: 0.3s; 
+} 
+
+#get-started:hover { 
+  background-color: #06314d; 
+} 
+
+/* Steps Section */ 
+.steps { 
+  background-color: #f4f6f7; 
+  padding: 60px 10%; 
+  text-align: center; 
+} 
+
+.steps .container { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+  gap: 30px; 
+} 
+
+.step h3 { 
+  color: #007b6e; 
+  font-size: 1.8em; 
+  margin-bottom: 10px; 
+} 
+
+.step p { 
+  font-size: 1em; 
+  line-height: 1.6; 
+  color: #555; 
+} 
+
+/* Popular Requests */ 
+.popular { 
+  background-color: #ffffff; 
+  text-align: center; 
+  padding: 70px 10%; 
+} 
+
+.popular h2 { 
+  color: #2e3a3a; 
+  font-size: 1.8em; 
+  font-weight: 600; 
+  margin-bottom: 50px; 
+  position: relative; 
+} 
+
+.popular h2::after { 
+  content: ""; 
+  display: block; 
+  width: 80px; 
+  height: 3px; 
+  background-color: #d4af37; 
+  margin: 10px auto 0; 
+} 
+
+.requests { 
+  display: flex; 
+  justify-content: center; 
+  flex-wrap: wrap; 
+  gap: 30px; 
+} 
+
+.request { 
+  width: 180px; 
+  padding: 25px; 
+  border-radius: 16px; 
+  background: #f7f9f9; 
+  transition: 0.3s ease; 
+  cursor: pointer; 
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05); 
+} 
+
+.request i { 
+  font-size: 2.2em; 
+  margin-bottom: 12px; 
+  color: #14a76c; 
+} 
+
+.request:hover { 
+  background-color: #e8f5e9; 
+  transform: translateY(-6px); 
+} 
+
+.request h4 { 
+  font-size: 1em; 
+  color: #333; 
+  margin: 0; 
+}
+/* ========================= */
+/* CONTACT US SECTION */
+/* ========================= */
+
+#contact {
+  background-color: #ffffff;
+  padding: 60px 10%;
+  text-align: center;
+  border-top: 2px solid #dcdcdc;
+}
+
+#contact h2 {
+  font-size: 2em;
+  color: #0a3d62;
+  margin-bottom: 10px;
+}
+
+#contact p {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.contact-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.contact-info {
+  flex: 1;
+  min-width: 250px;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.contact-info p {
+  margin: 6px 0;
+}
+
+.contact-form {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+.contact-form button {
+  background-color: #0a3d62;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.contact-form button:hover {
+  background-color: #06314d;
+}

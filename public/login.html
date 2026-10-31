@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - CivicConnect</title>
+  <link rel="stylesheet" href="styleMain.css">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <div id="navbar">
+    <div id="logo-area">
+      <h2 id="logo">
+        <img src="logo.svg" alt="CivicConnect Logo" width="160">
+      </h2>
+    </div>
+
+    <nav>
+      <ul id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="MyRequest.html">My Requests</a></li>
+        <li><a href="complain.html">Make a Request</a></li>
+      </ul>
+      <ul id="auth-links">
+        <li><a href="login.html" class="active">Login</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+    </nav>
+  </div>
+  <!-- ===================================== -->
+
+  <div class="container">
+    <div class="form-box">
+      <h2>Sign in</h2>
+
+      <!-- USER TYPE SWITCH -->
+      <div class="role-box">
+        <label class="role-option">
+          <input type="radio" name="role" value="Citizen" checked>
+          <span>Citizen</span>
+        </label>
+        <label class="role-option">
+          <input type="radio" name="role" value="NGO">
+          <span>NGO</span>
+        </label>
+      </div>
+
+      <!-- CITIZEN LOGIN FORM -->
+      <form id="citizen-form" class="role-form active" action="#" method="post">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+        <label for="password">Password:</label>
+        <div class="password-field">
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          <button type="button" id="show-password">Show</button>
+        </div>
+
+        <a href="#" class="forgot">Forgot your password?</a>
+
+        <button type="submit" class="btn">Log in</button>
+
+        <p class="text">Don't have an account? <a href="signup.html">Sign up</a></p>
+        <p class="text">Having issues with your account? <a href="#">Contact us</a></p>
+      </form>
+
+      <!-- NGO LOGIN FORM -->
+      <form id="ngo-form" class="role-form" action="#" method="post">
+        <label for="org-email">Organization Email:</label>
+        <input type="email" id="org-email" name="org-email" placeholder="Enter your organization email" required>
+
+        <label for="ngo-password">Password:</label>
+        <div class="password-field">
+          <input type="password" id="ngo-password" name="ngo-password" placeholder="Enter your password" required>
+          <button type="button" id="show-ngo-password">Show</button>
+        </div>
+
+        <a href="#" class="forgot">Forgot your password?</a>
+
+        <button type="submit" class="btn">Log in</button>
+
+        <p class="text">Don't have an account? <a href="signup.html">Sign up as NGO</a></p>
+        <p class="text">Having issues with your account? <a href="#">Contact us</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- include API helper -->
+  <script src="api.js"></script>
+
+  <script>
+    const citizenForm = document.getElementById("citizen-form");
+    const ngoForm = document.getElementById("ngo-form");
+    const roleRadios = document.querySelectorAll('input[name="role"]');
+
+    // Toggle between forms based on role selection
+    roleRadios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        if (e.target.value === "Citizen") {
+          citizenForm.classList.add("active");
+          ngoForm.classList.remove("active");
+        } else if (e.target.value === "NGO") {
+          ngoForm.classList.add("active");
+          citizenForm.classList.remove("active");
+        }
+      });
+    });
+
+    // Citizen password toggle
+    const togglePassword = document.getElementById("show-password");
+    const password = document.getElementById("password");
+
+    togglePassword.addEventListener("click", () => {
+      const type = password.getAttribute("type") === "password" ? "text" : "password";
+      password.setAttribute("type", type);
+      togglePassword.textContent = type === "password" ? "Show" : "Hide";
+    });
+
+    // NGO password toggle
+    const toggleNGOPassword = document.getElementById("show-ngo-password");
+    const ngoPassword = document.getElementById("ngo-password");
+
+    toggleNGOPassword.addEventListener("click", () => {
+      const type = ngoPassword.getAttribute("type") === "password" ? "text" : "password";
+      ngoPassword.setAttribute("type", type);
+      toggleNGOPassword.textContent = type === "password" ? "Show" : "Hide";
+    });
+
+    // Citizen login
+    citizenForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      try {
+        const res = await CivicConnectAPI.loginCitizen({
+          email: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value
+        });
+        window.location.href = "index.html";
+      } catch (err) {
+        alert(err.message || 'Login failed');
+      }
+    });
+
+    // NGO login
+    ngoForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      try {
+        const res = await CivicConnectAPI.loginNGO({
+          email: document.getElementById('org-email').value.trim(),
+          password: document.getElementById('ngo-password').value
+        });
+        window.location.href = "ngo_dashboard.html";
+      } catch (err) {
+        alert(err.message || 'NGO login failed');
+      }
+    });
+  </script>
+
+</body>
+</html>

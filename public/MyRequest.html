@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Requests - CivicConnect</title>
+  <link rel="stylesheet" href="styleMain.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f2f5f7;
+    }
+
+    .dashboard-container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-header {
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e3edf7;
+    }
+
+    .dashboard-header h2 {
+      color: #0a3d62;
+      margin: 0;
+    }
+
+    .complaints-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .complaint-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px;
+      background: #fafafa;
+      transition: all 0.3s;
+    }
+
+    .complaint-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .complaint-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #0a3d62;
+      margin: 0 0 10px 0;
+    }
+
+    .complaint-meta {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .complaint-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .complaint-description {
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.in-progress {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .status-badge.rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-badge.resolved {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state i {
+      font-size: 4em;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #0a3d62;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .empty-state a:hover {
+      background: #06314d;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar">
+    <div id="logo-area">
+      <h2 id="logo">
+        <img src="logo.svg" alt="CivicConnect Logo" width="160">
+      </h2>
+    </div>
+
+    <nav>
+      <ul id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="MyRequest.html" class="active">My Requests</a></li>
+        <li><a href="complain.html">Make a Request</a></li>
+        <li><a href="index.html#contact">Contact Us</a></li>
+      </ul>
+      <ul id="auth-links">
+        <li><a href="#" id="logout-btn">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h2>My Requests</h2>
+    </div>
+
+    <div id="loading">Loading your requests...</div>
+    <div id="no-complaints" style="display: none;" class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <h3>No complaints found</h3>
+      <p>You haven't submitted any requests yet.</p>
+      <a href="complain.html">Submit Your First Request</a>
+    </div>
+
+    <div class="complaints-grid" id="complaints-container" style="display: none;">
+      <!-- Complaints will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    let allComplaints = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadComplaints();
+      setupLogout();
+    });
+
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+
+      if (!token || role !== 'Citizen') {
+        alert('Please login as a Citizen to access this page');
+        window.location.href = 'login.html';
+      }
+    }
+
+    function setupLogout() {
+      document.getElementById('logout-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        alert('Logged out successfully');
+        window.location.href = 'index.html';
+      });
+    }
+
+    async function loadComplaints() {
+      const token = localStorage.getItem('token');
+      const loading = document.getElementById('loading');
+      const noComplaints = document.getElementById('no-complaints');
+      const container = document.getElementById('complaints-container');
+
+      try {
+        const response = await fetch('/api/complaints/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load complaints');
+        }
+
+        allComplaints = await response.json();
+        loading.style.display = 'none';
+
+        if (allComplaints.length === 0) {
+          noComplaints.style.display = 'block';
+          return;
+        }
+
+        container.style.display = 'grid';
+        displayComplaints(allComplaints);
+
+      } catch (err) {
+        console.error('Error loading complaints:', err);
+        loading.textContent = 'Error loading complaints. Please make sure backend is running.';
+      }
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    function displayComplaints(complaints) {
+      const container = document.getElementById('complaints-container');
+      
+      container.innerHTML = complaints.map(c => {
+        const date = new Date(c.createdAt).toLocaleDateString();
+        const statusClass = c.status.toLowerCase().replace(/\s+/g, '-');
+        
+        return `
+          <div class="complaint-card">
+            <h3 class="complaint-title">${esc(c.subject)}</h3>
+            <div class="complaint-meta">
+              <span><i class="fas fa-building"></i> ${esc(c.department)}</span>
+              <span><i class="fas fa-tag"></i> ${esc(c.ngoType || 'N/A')}</span>
+              <span><i class="fas fa-calendar"></i> ${date}</span>
+            </div>
+            <p class="complaint-description">${esc(c.description.substring(0, 150))}${c.description.length > 150 ? '...' : ''}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="status-badge ${statusClass}">${c.status}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+
+</body>
+</html>

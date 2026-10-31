@@ -1,0 +1,140 @@
+/* Keep navbar from styleMain.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f5f7;
+  margin: 0;
+  padding: 0;
+}
+
+/* Center the form under the navbar */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+  padding-top: 40px;
+}
+
+.form-box {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #222;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background: none;
+  border: none;
+  color: #0077b6;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.forgot {
+  display: inline-block;
+  margin-bottom: 15px;
+  color: #0077b6;
+  text-decoration: none;
+}
+
+.btn {
+  width: 100%;
+  background: #0077b6;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #005f8c;
+}
+
+.text {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.text a {
+  color: #0077b6;
+  text-decoration: none;
+}
+
+.text a:hover {
+  text-decoration: underline;
+}
+/* Role selection box */
+.role-box {
+  display: flex;
+  justify-content: space-around;
+  background: #eef6fa;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #cce3ef;
+}
+
+.role-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #005f8c;
+}
+
+.role-option input {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.role-form {
+  display: none;
+}
+
+.role-form.active {
+  display: block;
+}
+
+#org-address {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+

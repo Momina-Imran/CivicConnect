@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="styleMain.css">
+  <meta charset="UTF-8">
+  <title>CivicConnect</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navbar / Ribbon Section -->
+<div id="navbar">
+  <div id="logo-area">
+    <h2 id="logo">
+      <img src="logo.svg" alt="CivicConnect Logo" width="160">
+    </h2>
+  </div>
+
+  <!-- Navigation Links below the logo -->
+  <nav>
+  <ul id="nav-links">
+    <li><a href="index.html">Home</a></li>
+   <li><a href="#" id="my-requests-link">My Requests</a></li>
+<li><a href="#" id="make-request-link">Make a Request</a></li>
+    <li><a href="#contact">Contact Us</a></li>
+  </ul>
+  <ul id="auth-links">
+    <li><a href="login.html" id="auth-link-1">Login</a></li>
+    <li><a href="signup.html" id="auth-link-2">Sign Up</a></li>
+  </ul>
+</nav>
+</div>
+
+  <!-- Hero Section -->
+  <div id="hero">
+    <img src="pakistan historic banner.png" alt="CivicConnect Banner" id="hero-banner">
+
+    <!-- Heading: top-right over the image -->
+    <h1 class="typing-text" style="--chars:22;">Welcome to CivicConnect</h1>
+
+    <!-- Tagline: BELOW the banner -->
+    <div class="banner-caption">
+      <p>Your city's smarter way to report and resolve issues.</p>
+    </div>
+  </div>
+
+ 
+  <!-- ========================= -->
+  <!-- HOW IT WORKS SECTION -->
+  <!-- ========================= -->
+  <section class="steps">
+  <div class="container">
+    <div class="step">
+      <h3>1.</h3>
+      <p>Civilians and NGOs collaborate by reporting social, environmental, and community issues through the platform.</p>
+    </div>
+
+    <div class="step">
+      <h3>2.</h3>
+      <p>Each report is categorized to match the specific NGO sector such as Waste Management, Child Protection, Health, or Education.</p>
+    </div>
+
+    <div class="step">
+      <h3>3.</h3>
+      <p>Images and precise locations help NGOs verify and prioritize cases more efficiently.</p>
+    </div>
+
+    <div class="step">
+      <h3>4.</h3>
+      <p>NGOs receive only the cases relevant to their sector, Please submit your application/request in relevant sector.</p>
+    </div>
+  </div>
+</section>
+
+
+  <!-- ========================= -->
+  <!-- MOST POPULAR REQUESTS SECTION -->
+  <!-- ========================= -->
+  <section class="popular">
+    <h2>Most Popular Requests</h2>
+    <div class="requests">
+     <div class="request" data-department="waste" data-type="garbage">
+      <i class="fa-solid fa-trash-can"></i>
+     <h4>Abandoned Garbage</h4>
+    </div>
+    <div class="request" data-department="disaster management" data-type="disaster management">
+      <i class="fa-solid fa-earth-americas"></i>
+      <h4>Disaster Management</h4>
+    
+    </div>
+    <div class="request" data-department="education" data-type="education">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <h4>Education/Scholarships</h4>
+    </div>
+    <div class="request" data-department="women" data-type="women">
+      <i class="fa-solid fa-female"></i>
+      <h4>Women Rights</h4>
+    </div>
+    <div class="request" data-department="water" data-type="water">
+      <i class="fa-solid fa-faucet-drip"></i>
+      <h4>Water and Sanitation</h4>
+  </div>
+</div>
+</section>
+
+<!-- ========================= -->
+<!-- CONTACT US SECTION -->
+<!-- ========================= -->
+<section id="contact">
+  <h2>Contact Us</h2>
+  <p>If you have any questions, feedback, or need assistance, please reach out to us.</p>
+
+  <div class="contact-container">
+    <div class="contact-info">
+      <p><strong>Email:</strong> support@civicconnect.com</p>
+      <p><strong>Phone:</strong> +92 300 1234567</p>
+      <p><strong>Address:</strong> Civic Center, Islamabad, Pakistan</p>
+    </div>
+
+    <form id="contact-form" class="contact-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+  </div>
+</section>
+
+
+  <!-- Footer Section -->
+  <div id="footer">
+    <p>&copy; 2025 CivicConnect |<a href="#contact">Contact Us</a> |All Rights Reserved</p>
+  </div>
+
+
+<script>
+  // ========================================
+  // ON PAGE LOAD - UPDATE NAVBAR BASED ON AUTH STATUS
+  // ========================================
+  window.addEventListener('DOMContentLoaded', () => {
+    updateNavbarAuth();
+    setupProtectedLinks();
+    setupRequestCards();
+    setupContactForm();
+  });
+
+  // ========================================
+  // UPDATE NAVBAR FOR LOGGED IN/OUT USERS
+  // ========================================
+  function updateNavbarAuth() {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const authLink1 = document.getElementById('auth-link-1');
+    const authLink2 = document.getElementById('auth-link-2');
+    const myRequestsLink = document.getElementById('my-requests-link');
+
+    if (token && role) {
+      // User is logged in
+      authLink1.textContent = 'Logout';
+      authLink1.href = '#';
+      authLink1.onclick = (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        alert('Logged out successfully');
+        window.location.reload();
+      };
+      authLink2.style.display = 'none';
+
+      // Update My Requests link based on role
+      if (role === 'Citizen') {
+        myRequestsLink.href = 'MyRequest.html';
+      } else if (role === 'NGO') {
+        myRequestsLink.href = 'ngo_dashboard.html';
+      }
+    } else {
+      // User is not logged in - keep default links
+      myRequestsLink.href = '#';
+    }
+  }
+
+  // ========================================
+  // PROTECT LINKS - REQUIRE LOGIN
+  // ========================================
+  function setupProtectedLinks() {
+    const makeRequestLink = document.getElementById('make-request-link');
+    const myRequestsLink = document.getElementById('my-requests-link');
+
+    // "Make a Request" - Citizens only
+    makeRequestLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+
+      if (!token) {
+        alert('Please login to make a request');
+        window.location.href = 'login.html';
+      } else if (role === 'Citizen') {
+        window.location.href = 'complain.html';
+      } else {
+        alert('Only citizens can make requests');
+      }
+    });
+
+    // "My Requests" - Require login
+    myRequestsLink.addEventListener('click', (e) => {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        e.preventDefault();
+        alert('Please login to view your requests');
+        window.location.href = 'login.html';
+      }
+      // If logged in, href is already set correctly in updateNavbarAuth()
+    });
+  }
+
+  // ========================================
+  // POPULAR REQUEST CARDS - REQUIRE LOGIN
+  // ========================================
+  function setupRequestCards() {
+    const requests = document.querySelectorAll('.request');
+
+    requests.forEach(req => {
+      req.addEventListener('click', () => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        const department = req.dataset.department;
+
+        if (!token) {
+          alert('Please login to make a request');
+          window.location.href = 'login.html';
+        } else if (role === 'Citizen') {
+          window.location.href = `complain.html?department=${department}`;
+        } else {
+          alert('Only citizens can make requests');
+        }
+      });
+    });
+  }
+
+  // ========================================
+  // CONTACT FORM SUBMISSION
+  // ========================================
+  function setupContactForm() {
+    const contactForm = document.getElementById('contact-form');
+    if (!contactForm) return;
+    
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('Message successfully sent! We will get back to you soon.');
+      contactForm.reset();
+    });
+  }
+</script>
+
+</body>
+</html>

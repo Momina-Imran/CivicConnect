@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Complaint Details - CivicConnect</title>
+  <link rel="stylesheet" href="styleMain.css">
+  <link rel="stylesheet" href="ngo_dashboard.css">
+</head>
+<body>
+
+<div id="navbar">
+  <div id="logo-area">
+    <h2 id="logo">
+      <img src="logo.svg" alt="CivicConnect Logo" width="160">
+    </h2>
+  </div>
+  <nav>
+    <ul id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ngo_dashboard.html">Dashboard</a></li>
+    </ul>
+    <ul id="auth-links">
+      <li><a href="#" id="logout-btn">Logout</a></li>
+    </ul>
+  </nav>
+</div>
+
+<div class="ngo-container">
+  <h2>Complaint Details</h2>
+
+  <div class="detail-box">
+    <h3>From (Complainant)</h3>
+    <p><strong>Name:</strong> <span id="complainant-name">...</span></p>
+    <p><strong>Email:</strong> <span id="complainant-email">...</span></p>
+    <p><strong>Contact Number:</strong> <span id="complainant-phone">...</span></p>
+
+    <h3>To (Department)</h3>
+    <p><strong>Department:</strong> <span id="department">...</span></p>
+
+    <h3>Request Information</h3>
+    <p><strong>Subject:</strong> <span id="subject">...</span></p>
+    <p><strong>Assigned NGO:</strong> <span id="ngo-category">...</span></p>
+
+    <p><strong>Description:</strong></p>
+    <div class="description-box">
+      <p id="description">...</p>
+    </div>
+
+    <div id="attachment-wrap" style="display:none">
+      <p><strong>Attached Image:</strong></p>
+      <img id="attachment-image" alt="Complaint Image" style="max-width: 300px; margin: 10px 0;">
+    </div>
+
+    <h3>Action Required</h3>
+    <label for="status"><strong>Update Status:</strong></label>
+    <select id="status">
+      <option value="Pending">Pending</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Resolved">Resolved</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+
+    <label for="remarks"><strong>Remarks:</strong></label>
+    <textarea id="remarks" rows="4" placeholder="Add your remarks here..."></textarea>
+
+    <div class="button-group">
+      <button class="btn btn-save">Save Changes</button>
+      <button class="btn btn-back">Back to List</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  const complaintId = new URLSearchParams(window.location.search).get('id');
+  const set = (id, v) => { document.getElementById(id).textContent = v || 'N/A'; };
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    if (!localStorage.getItem('token') || localStorage.getItem('role') !== 'NGO') {
+      alert('Please login as an NGO to access this page');
+      window.location.href = 'login.html';
+      return;
+    }
+    try {
+      const c = await CivicConnectAPI.getComplaint(complaintId);
+      set('complainant-name', c.name);
+      set('complainant-email', c.email);
+      set('complainant-phone', c.contact);
+      set('department', c.department);
+      set('subject', c.subject);
+      set('ngo-category', c.ngoType);
+      set('description', c.description);
+      document.getElementById('status').value = c.status;
+      document.getElementById('remarks').value = c.remarks || '';
+      if (c.attachment) {
+        document.getElementById('attachment-image').src = c.attachment;
+        document.getElementById('attachment-wrap').style.display = 'block';
+      }
+    } catch (err) {
+      alert(err.message || 'Could not load complaint');
+      window.location.href = 'ngo_dashboard.html';
+    }
+  });
+
+  document.querySelector('.btn-save').addEventListener('click', async () => {
+    try {
+      await CivicConnectAPI.updateComplaintStatus(complaintId, {
+        status: document.getElementById('status').value,
+        remarks: document.getElementById('remarks').value
+      });
+      alert('Complaint updated successfully');
+    } catch (err) {
+      alert(err.message || 'Update failed');
+    }
+  });
+
+  document.querySelector('.btn-back').addEventListener('click', () => {
+    window.location.href = 'ngo_dashboard.html';
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.clear();
+    window.location.href = 'index.html';
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit a Complaint - CivicConnect</title>
+  <link rel="stylesheet" href="styleMain.css">
+  <link rel="stylesheet" href="complain.css">
+</head>
+<body>
+
+  <!-- ========== NAVBAR / RIBBON ========== -->
+  <div id="navbar">
+    <div id="logo-area">
+      <h2 id="logo">
+        <img src="logo.svg" alt="CivicConnect Logo" width="160">
+      </h2>
+    </div>
+
+    <nav>
+      <ul id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="MyRequest.html">My Requests</a></li>
+        <li><a href="complain.html" class="active">Make a Request</a></li>
+   
+      </ul>
+      <ul id="auth-links">
+        <li><a href="#" id="logout-link">Logout</a></li>
+      </ul>
+    </nav>
+  </div>
+  <!-- ===================================== -->
+
+  <div class="container">
+    <div class="form-box">
+      <h2>Submit a Complaint</h2>
+
+      <form id="complaint-form" action="#" method="post" enctype="multipart/form-data">
+        <!-- FROM -->
+        <label for="name">From (Your Name):</label>
+        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+        <label for="contact">Contact Number:</label>
+        <input type="tel" id="contact" name="contact" placeholder="Enter your contact number" required>
+
+        <!-- TO -->
+        <label for="department">To (Department):</label>
+        <select id="department" name="department" required>
+          <option value="">Select Department</option>
+          <option value="waste">Waste Management</option>
+         
+          <option value="disaster management">Disaster Management</option>
+          <option value="water">Water Supply & Sanitation</option>
+          <option value="health">Health Services</option>
+          <option value="women">Women Rights and Protection</option>
+          <option value="education">Education</option>
+          <option value="child">Child Labour / Child Protection</option>
+          <option value="orphans">Orphan Care</option>
+          <option value="disabled">Disabled Support</option>
+          <option value="other">Other</option>
+        </select>
+
+        <!-- SUBJECT -->
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" placeholder="Short title for your complaint" required>
+
+        <!-- NGOs -->
+        <label for="orgName">Select for NGO:</label>
+        <select id="orgName" name="ngoType" required>
+        <option value="">Select NGO</option>
+        </select>
+
+
+        <!-- DESCRIPTION -->
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="6" placeholder="Describe the issue in detail..." required></textarea>
+
+        <!-- ATTACHMENT -->
+        <label for="attachment">Attach Image (optional):</label>
+        <input type="file" id="attachment" name="attachment" accept="image/*">
+
+        <button type="submit" class="btn">Submit Complaint</button>
+      </form>
+    </div>
+ </div>
+<!-- include API helper -->
+<script src="api.js"></script>
+
+<script>
+  // Helper function to get query params
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+  //authentication check
+  function checkAuthentication() {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    if (!token || role !== 'Citizen') {
+      alert('Please login as a Citizen to submit a complaint');
+      window.location.href = 'login.html';
+      return;
+    }
+}
+
+  window.addEventListener('DOMContentLoaded', () => {
+    checkAuthentication();
+
+    const deptSelect = document.getElementById('department');
+    const ngoSelect  = document.getElementById('orgName');
+    const form       = document.getElementById('complaint-form');
+    document.getElementById('logout-link').addEventListener('click', (e) => { e.preventDefault(); localStorage.clear(); window.location.href = 'index.html'; });
+
+    // Prefill department if coming from dashboard
+    const deptParam = getQueryParam('department');
+    if (deptParam) {
+      deptSelect.value = deptParam;
+      loadNGOs(deptParam);
+    }
+
+    // Load NGOs when department changes
+    deptSelect.addEventListener('change', () => {
+      loadNGOs(deptSelect.value);
+    });
+
+    // Fetch NGOs from backend
+    async function loadNGOs(department) {
+      ngoSelect.innerHTML = '<option value="">Loading NGOs...</option>';
+
+      if (!department) {
+        ngoSelect.innerHTML = '<option value="">Select NGO</option>';
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `/api/ngos?department=${encodeURIComponent(department)}`
+        );
+
+        const ngos = await res.json();
+
+        ngoSelect.innerHTML = '<option value="">Select NGO</option>';
+
+        ngos.forEach(ngo => {
+          const option = document.createElement('option');
+          option.value = ngo._id;       // NGO id (server stores NGO + its name)
+          option.textContent = ngo.name;
+          ngoSelect.appendChild(option);
+        });
+
+      } catch (err) {
+        console.error(err);
+        ngoSelect.innerHTML = '<option value="">Failed to load NGOs</option>';
+      }
+    }
+
+    // Submit complaint
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        const formData = new FormData(form);
+        await CivicConnectAPI.submitComplaint(formData);
+
+        alert('Complaint submitted successfully');
+        window.location.href = 'index.html';
+
+      } catch (err) {
+        alert(err.message || 'Submission failed');
+      }
+    });
+
+  });
+</script>
+</body>
+</html>

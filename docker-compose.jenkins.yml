@@ -1,0 +1,47 @@
+# PART II - no Dockerfile: the code is attached as a volume. Different ports and container names.
+services:
+  db:
+    image: mysql:8.0
+    container_name: ci_civic_db
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPass#2026
+      MYSQL_DATABASE: civicconnect
+      MYSQL_USER: civic_app
+      MYSQL_PASSWORD: CivicPass#2026
+    ports:
+      - "3308:3306"
+    volumes:
+      - ci_civic_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pRootPass#2026 --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  web:
+    image: node:20-alpine
+    container_name: ci_civic_web
+    working_dir: /app
+    command: sh -c "npm install --omit=dev && node server.js"
+    environment:
+      PORT: 3000
+      JWT_SECRET: change-this-to-a-long-random-string
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: civic_app
+      DB_PASSWORD: CivicPass#2026
+      DB_NAME: civicconnect
+    ports:
+      - "8001:3000"
+    volumes:
+      - ./:/app                          # code volume (Jenkins workspace)
+      - ci_node_modules:/app/node_modules
+      - ci_civic_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  ci_civic_db_data:
+  ci_node_modules:
+  ci_civic_uploads:
