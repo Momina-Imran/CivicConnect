@@ -4,7 +4,7 @@ CivicConnect is a web platform that connects citizens' complaints with the NGOs 
 
 **Stack:** Node.js, Express, MySQL 8 (`mysql2`), JWT authentication, `multer` for uploads. Express serves the frontend (`public/`) and the API (`/api/*`) from a single port.
 
-This repository is also used for **CSC418 – DevOps for Cloud Computing, Assignment 2**: containerized deployment on AWS EC2 (Part I) and a Jenkins CI/CD pipeline (Part II).
+This repository is also used for **CSC418 – DevOps for Cloud Computing, Assignment 2**: containerized deployment on AWS EC2 (Part I) and a Jenkins CI/CD pipeline (Part II)
 
 ---
 
